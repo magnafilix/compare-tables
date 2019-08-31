@@ -31,5 +31,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/magnafilix/compare-tables/issues"
+  },
+  "homepage": "https://github.com/magnafilix/compare-tables#readme"
 }
