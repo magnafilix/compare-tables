@@ -11,8 +11,9 @@ import Loader from './components/Loader'
 import SnackBar from './components/SnackBar'
 import SelectInput from './components/SelectInput'
 import Table from './components/Table'
+import SimpleButton from './components/SimpleButton'
 
-import { fetchAllPlannings } from './utils/api'
+import { fetchAllPlannings, deletePlanning } from './utils/api'
 
 const styles = theme => ({
   layout: {
@@ -33,6 +34,9 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     marginBottom: '35px'
+  },
+  spaceBetween: {
+    justifyContent: 'space-between'
   },
   notifier: {
     textAlign: 'center',
@@ -57,7 +61,9 @@ class App extends Component {
     supply: ''
   }
 
-  componentDidMount = () => fetchAllPlannings()
+  componentDidMount = () => this._fetchAllPlannings()
+
+  _fetchAllPlannings = () => fetchAllPlannings()
     .then(res => {
       const { data } = res
       if (data.length === 0)
@@ -85,6 +91,20 @@ class App extends Component {
   }
 
   handleCloseSnackBar = () => this.setState({ snackBarActive: false, errorMessage: '' })
+
+  _deletePlanning = id => async () => {
+    await this.setState({ loading: true, plan: '', demand: '', supply: '' })
+    deletePlanning(id)
+      .then(res => {
+        const { status } = res
+        if (status === 204) this._fetchAllPlannings()
+      })
+      .catch(err => this.setState({
+        errorMessage: err.message || 'Error on deleting planning',
+        snackBarActive: true,
+        loading: false
+      }))
+  }
 
   render() {
     const {
@@ -124,7 +144,7 @@ class App extends Component {
               ? <Loader loading={loading} />
               : (
                 <Grid>
-                  <Grid className={classes.row}>
+                  <Grid className={`${classes.row} ${classes.spaceBetween}`}>
                     <SelectInput
                       inputName={selectNames.plan.showName}
                       field={selectNames.plan.objName}
@@ -133,6 +153,11 @@ class App extends Component {
                       value={plan}
                       data={plans}
                     />
+                    {
+                      plan
+                        ? <SimpleButton name={'Delete'} onClick={this._deletePlanning(plan)} />
+                        : null
+                    }
                   </Grid>
                   <Grid className={classes.row}>
                     <SelectInput
