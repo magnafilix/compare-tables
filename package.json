@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.4.0",
+    "@material-ui/icons": "^4.2.1",
+    "axios": "^0.19.0",
+    "material-ui": "^1.0.0-beta.47",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-scripts": "3.1.1"
+    "react-scripts": "3.1.1",
+    "react-spinners": "^0.6.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -35,5 +40,9 @@
   "bugs": {
     "url": "https://github.com/magnafilix/compare-tables/issues"
   },
-  "homepage": "https://github.com/magnafilix/compare-tables#readme"
+  "homepage": "https://github.com/magnafilix/compare-tables#readme",
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-plugin-react": "^7.14.3"
+  }
 }
