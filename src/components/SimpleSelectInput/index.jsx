@@ -10,7 +10,7 @@ const styles = theme => ({
   selectInsiedTr: {
     width: '75%',
     position: 'absolute',
-    top: '5px'
+    top: '7px'
   },
   fontSize: {
     fontSize: '14px'

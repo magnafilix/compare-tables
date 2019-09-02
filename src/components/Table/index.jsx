@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import {
+  Grid,
   Table,
   TableBody,
   TableCell,
@@ -9,6 +10,7 @@ import {
   withStyles
 } from '@material-ui/core'
 import SimpleSelectInput from '../SimpleSelectInput'
+import SimpleSwitch from '../SimpleSwitch'
 
 const styles = theme => ({
   root: {
@@ -21,6 +23,19 @@ const styles = theme => ({
   },
   relative: {
     position: 'relative'
+  },
+  lightGoldenBgk: {
+    backgroundColor: 'lightgoldenrodyellow'
+  },
+  alignRight: {
+    textAlign: 'right',
+    color: 'rgba(0, 0, 0, 0.54)'
+  },
+  switchWrapper: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: 10
   }
 })
 
@@ -28,7 +43,8 @@ class SimpleTable extends Component {
   state = {
     levelName: '',
     levelNames: [],
-    planningYears: []
+    planningYears: [],
+    hintEnabled: false
   }
 
   componentDidMount = () => {
@@ -51,8 +67,10 @@ class SimpleTable extends Component {
 
   handleSelectChange = event => this.setState({ levelName: event.target.value })
 
+  handleSwitchChange = name => event => this.setState({ [name]: event.target.checked })
+
   render() {
-    const { levelName, levelNames, planningYears } = this.state
+    const { levelName, levelNames, planningYears, hintEnabled } = this.state
     const {
       classes,
       PLD, PLS
@@ -71,33 +89,62 @@ class SimpleTable extends Component {
     }
 
     return (
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Planning level</TableCell>
+      <Grid>
+        <Paper className={classes.root}>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Planning level</TableCell>
+                {
+                  planningYears.map((year, index) => <TableCell key={`${year}&${index}`}>{year}</TableCell>)
+                }
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {
-                planningYears.map((year, index) => <TableCell key={`${year}&${index}`}>{year}</TableCell>)
+                hintEnabled && pldSet && pldSet.length && plsSet && plsSet.length
+                  ? (
+                    <Fragment>
+                      <TableRow>
+                        <TableCell className={classes.alignRight}>Demand</TableCell>
+                        {
+                          pldSet.map((pld, i) => <TableCell key={`${pld}&${i}`}>{pld}</TableCell>)
+                        }
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className={classes.alignRight}>Supply</TableCell>
+                        {
+                          plsSet.map((pld, i) => <TableCell key={`${pld}&${i}`}>{pld}</TableCell>)
+                        }
+                      </TableRow>
+                    </Fragment>
+                  )
+                  : null
               }
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell className={classes.relative}>
-                <SimpleSelectInput
-                  handleChange={this.handleSelectChange}
-                  name='table-select'
-                  value={levelName}
-                  data={levelNames}
-                />
-              </TableCell>
-              {
-                setsDiff.map((num, i) => <TableCell key={`${num}&${i}`}>{num}</TableCell>)
-              }
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Paper>
+              <TableRow className={classes.lightGoldenBgk}>
+                <TableCell className={classes.relative}>
+                  <SimpleSelectInput
+                    handleChange={this.handleSelectChange}
+                    name='table-select'
+                    value={levelName}
+                    data={levelNames}
+                  />
+                </TableCell>
+                {
+                  setsDiff.map((num, i) => <TableCell key={`${num}&${i}`}>{num}</TableCell>)
+                }
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Paper>
+        <Grid className={classes.switchWrapper}>
+          <SimpleSwitch
+            handleChange={this.handleSwitchChange}
+            checked={hintEnabled}
+            name={'hintEnabled'}
+          />
+        </Grid>
+      </Grid>
     )
   }
 }
