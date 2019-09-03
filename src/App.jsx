@@ -44,7 +44,7 @@ const styles = theme => ({
     marginTop: '15%'
   },
   button: {
-    marginRight: 10
+    margin: '5px 10px 5px 0'
   }
 })
 

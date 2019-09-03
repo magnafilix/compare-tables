@@ -50,7 +50,7 @@ const styles = theme => ({
     marginTop: 10
   },
   marginTop: {
-    marginTop: 35
+    margin: '35 0 35 0'
   }
 })
 
@@ -58,13 +58,7 @@ class PlanningBuilder extends Component {
   state = {
     planningYears: 0,
     tablesCount: 1,
-    levelsCount: 1,
-    d_1: '',
-    d_1_l_1: '',
-    d_1_l_1_y_2019: '',
-    s_1: '',
-    s_1_l_1: '',
-    s_1_l_1_y_2019: ''
+    levelsCount: 0
   }
 
   handleChange = name => event => {
@@ -81,6 +75,82 @@ class PlanningBuilder extends Component {
 
   isDisabled = () => Object.values(this.state).some(v => v === '0' || v === '' || v === 0)
 
+  createArrayByNum = num => [...Array(Number(num)).keys()]
+
+  mapKeyName = key => {
+    const regex = /_/g
+    if (key.match(regex).length === 1) return 'tableName'
+    if (key.match(regex).length === 3) return 'levelName'
+    if (key.match(regex).length === 5) return `FTE${key.substr(key.lastIndexOf('_'))}`
+  }
+
+  mapStateToPlanningTable = () => {
+    const { planningYears } = this.state
+
+    const newPlanning = {
+      planningName: `Planning for ${planningYears} years`,
+      planningDemand: [],
+      planningSupply: []
+    }
+
+    const dArr = []
+    const sArr = []
+
+    Object
+      .keys(this.state)
+      .forEach(key => {
+        if (key.includes('d_'))
+          return dArr.push({ [this.mapKeyName(key)]: this.state[key] })
+        if (key.includes('s_'))
+          return sArr.push({ [this.mapKeyName(key)]: this.state[key] })
+      })
+
+    let dObj = { tableName: '', planningLevels: [] }
+    let lObj = { tableName: '', planningLevels: [] }
+
+    for (let i = 0; i < dArr.length; i++) {
+      if (dArr[i].tableName) {
+        dObj.tableName = dArr[i].tableName
+        continue
+      }
+
+      if (dArr[i].levelName) {
+        dObj.planningLevels.push({ levelName: dArr[i].levelName })
+        continue
+      }
+
+      dObj.planningLevels[dObj.planningLevels.length - 1][Object.keys(dArr[i])[0]] = Number(Object.values(dArr[i])[0])
+
+      if (dArr[i + 1] && dArr[i + 1].tableName) {
+        newPlanning.planningDemand.push(dObj)
+        dObj = { tableName: '', planningLevels: [] }
+      }
+
+      if (!dArr[i + 1]) newPlanning.planningDemand.push(dObj)
+    }
+
+    for (let i = 0; i < sArr.length; i++) {
+      if (sArr[i].tableName) {
+        lObj.tableName = sArr[i].tableName
+        continue
+      }
+
+      if (sArr[i].levelName) {
+        lObj.planningLevels.push({ levelName: sArr[i].levelName })
+        continue
+      }
+
+      lObj.planningLevels[lObj.planningLevels.length - 1][Object.keys(sArr[i])[0]] = Number(Object.values(sArr[i])[0])
+
+      if (sArr[i + 1] && sArr[i + 1].tableName) {
+        newPlanning.planningSupply.push(lObj)
+        lObj = { tableName: '', planningLevels: [] }
+      }
+
+      if (!sArr[i + 1]) newPlanning.planningSupply.push(lObj)
+    }
+  }
+
   render() {
     const { classes } = this.props
     const {
@@ -89,9 +159,9 @@ class PlanningBuilder extends Component {
       levelsCount
     } = this.state
 
-    const tablesYearsArr = [...Array(Number(planningYears)).keys()]
-    const tablesCountArr = [...Array(Number(tablesCount)).keys()]
-    const levelsCountArr = [...Array(Number(levelsCount)).keys()]
+    const tablesYearsArr = this.createArrayByNum(planningYears)
+    const tablesCountArr = this.createArrayByNum(tablesCount)
+    const levelsCountArr = this.createArrayByNum(levelsCount)
     const currentYear = new Date().getFullYear()
 
     return (
@@ -140,7 +210,7 @@ class PlanningBuilder extends Component {
                           id="demand-table-level"
                           label="Level name"
                           className={`${classes.textField} ${classes.lightYellow}`}
-                          value={this.state[`d_l_${level + 1}_${table + 1}`]}
+                          value={this.state[`d_${table + 1}_l_${level + 1}`]}
                           onChange={this.handleChange(`d_${table + 1}_l_${level + 1}`)}
                           margin="normal"
                         />
@@ -151,7 +221,7 @@ class PlanningBuilder extends Component {
                               id={`demand-table-${currentYear + year}`}
                               label={currentYear + year}
                               className={classes.textField}
-                              value={this.state[`d_${currentYear + year}_l_${level + 1}_${table + 1}`]}
+                              value={this.state[`d_${table + 1}_l_${level + 1}_y_${currentYear + year}`]}
                               onChange={this.handleChange(`d_${table + 1}_l_${level + 1}_y_${currentYear + year}`)}
                               margin="normal"
                               type="number"
@@ -186,7 +256,7 @@ class PlanningBuilder extends Component {
                           id="supply-table-level"
                           label="Level name"
                           className={`${classes.textField} ${classes.lightYellow}`}
-                          value={this.state[`s_l_${level + 1}_${table + 1}`]}
+                          value={this.state[`s_${table + 1}_l_${level + 1}`]}
                           onChange={this.handleChange(`s_${table + 1}_l_${level + 1}`)}
                           margin="normal"
                         />
@@ -197,7 +267,7 @@ class PlanningBuilder extends Component {
                               id={`supply-table-${currentYear + year}`}
                               label={currentYear + year}
                               className={classes.textField}
-                              value={this.state[`s_${currentYear + year}_${table + 1}`]}
+                              value={this.state[`s_${table + 1}_l_${level + 1}_y_${currentYear + year}`]}
                               onChange={this.handleChange(`s_${table + 1}_l_${level + 1}_y_${currentYear + year}`)}
                               margin="normal"
                               type="number"
@@ -216,7 +286,7 @@ class PlanningBuilder extends Component {
         <SimpleButton
           name='Save'
           className={`${classes.button} ${classes.marginTop}`}
-          onClick={() => console.log('creating...')}
+          onClick={() => this.mapStateToPlanningTable()}
           disabled={this.isDisabled()}
         />
       </Grid>
