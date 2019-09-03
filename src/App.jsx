@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import {
   Grid,
   Typography,
@@ -12,6 +12,7 @@ import SnackBar from './components/SnackBar'
 import SelectInput from './components/SelectInput'
 import Table from './components/Table'
 import SimpleButton from './components/SimpleButton'
+import SimpleModal from './components/SimpleModal'
 
 import { fetchAllPlannings, deletePlanning } from './utils/api'
 
@@ -38,6 +39,10 @@ const styles = theme => ({
   spaceBetween: {
     justifyContent: 'space-between'
   },
+  centrify: {
+    justifyContent: 'center',
+    marginTop: '15%'
+  },
   notifier: {
     textAlign: 'center',
     marginTop: '15%'
@@ -54,6 +59,7 @@ class App extends Component {
   state = {
     loading: true,
     snackBarActive: false,
+    modalActive: false,
     errorMessage: '',
     plannings: [],
     plan: '',
@@ -106,10 +112,15 @@ class App extends Component {
       }))
   }
 
+  handleModalClose = () => this.setState({ modalActive: false })
+
+  handleModalOpen = () => this.setState({ modalActive: true })
+
   render() {
     const {
       loading,
       snackBarActive,
+      modalActive,
       errorMessage,
       plannings,
       plan,
@@ -155,8 +166,13 @@ class App extends Component {
                     />
                     {
                       plan
-                        ? <SimpleButton name={'Delete'} onClick={this._deletePlanning(plan)} />
-                        : null
+                        ? (
+                          <Fragment>
+                            <SimpleButton name='Create' onClick={() => this.handleModalOpen()} />
+                            <SimpleButton name='Delete' onClick={this._deletePlanning(plan)} />
+                          </Fragment>
+                        )
+                        : <SimpleButton name='Create' onClick={() => this.handleModalOpen()} />
                     }
                   </Grid>
                   <Grid className={classes.row}>
@@ -178,23 +194,39 @@ class App extends Component {
                     />
                   </Grid>
                   {
-                    PLD && PLS
+                    !plan && !errorMessage
                       ? (
-                        <Table
-                          PLD={PLD}
-                          PLS={PLS}
-                          name={name}
-                        />
+                        <Typography variant="h5" className={classes.notifier}>
+                          For start planning, please create one
+                        </Typography>
                       )
                       : (
-                        <Typography variant="h5" className={classes.notifier}>
-                          For start planning, please select demand and supply scenarios
-                        </Typography>
+                        <Fragment>
+                          {
+                            plan && PLD && PLS
+                              ? (
+                                <Table
+                                  PLD={PLD}
+                                  PLS={PLS}
+                                  name={name}
+                                />
+                              )
+                              : (
+                                <Typography variant="h5" className={classes.notifier}>
+                                  For start planning, please select demand and supply scenarios
+                                </Typography>
+                              )
+                          }
+                        </Fragment>
                       )
                   }
                 </Grid>
               )
           }
+          <SimpleModal
+            open={modalActive}
+            handleClose={this.handleModalClose}
+          />
           <SnackBar
             handleClose={this.handleCloseSnackBar}
             message={errorMessage}
