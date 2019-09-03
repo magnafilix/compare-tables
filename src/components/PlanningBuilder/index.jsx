@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { Grid, TextField, withStyles, Typography } from '@material-ui/core'
 import PlusButton from '../PlusButton'
 import MinusButton from '../MinusButton'
+import SimpleButton from '../SimpleButton'
 
 const styles = theme => ({
   textField: {
@@ -47,6 +48,9 @@ const styles = theme => ({
     width: '50%',
     borderBottom: '2px solid',
     marginTop: 10
+  },
+  marginTop: {
+    marginTop: 35
   }
 })
 
@@ -54,7 +58,13 @@ class PlanningBuilder extends Component {
   state = {
     planningYears: 0,
     tablesCount: 1,
-    levelsCount: 1
+    levelsCount: 1,
+    d_1: '',
+    d_1_l_1: '',
+    d_1_l_1_y_2019: '',
+    s_1: '',
+    s_1_l_1: '',
+    s_1_l_1_y_2019: ''
   }
 
   handleChange = name => event => {
@@ -68,6 +78,8 @@ class PlanningBuilder extends Component {
   }
 
   _handleChange = (name, value) => value > -1 && this.setState({ [name]: value })
+
+  isDisabled = () => Object.values(this.state).some(v => v === '0' || v === '' || v === 0)
 
   render() {
     const { classes } = this.props
@@ -201,6 +213,12 @@ class PlanningBuilder extends Component {
             }
           </Grid>
         </Grid>
+        <SimpleButton
+          name='Save'
+          className={`${classes.button} ${classes.marginTop}`}
+          onClick={() => console.log('creating...')}
+          disabled={this.isDisabled()}
+        />
       </Grid>
     )
   }
