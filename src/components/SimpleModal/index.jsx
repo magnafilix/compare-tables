@@ -31,7 +31,8 @@ class SimpleModal extends Component {
       open = false,
       handleClose,
       classes,
-      planningYears
+      planningYears,
+      createPlanning
     } = this.props
 
     return (
@@ -43,7 +44,10 @@ class SimpleModal extends Component {
         className={classes.modal}
       >
         <Grid className={classes.paper}>
-          <PlanningBuiler planningYears={planningYears} />
+          <PlanningBuiler
+            createPlanning={createPlanning}
+            planningYears={planningYears}
+          />
         </Grid>
       </Modal>
     )

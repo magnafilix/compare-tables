@@ -14,7 +14,7 @@ import Table from './components/Table'
 import SimpleButton from './components/SimpleButton'
 import SimpleModal from './components/SimpleModal'
 
-import { fetchAllPlannings, deletePlanning } from './utils/api'
+import { fetchAllPlannings, deletePlanning, createPlanning } from './utils/api'
 
 const styles = theme => ({
   layout: {
@@ -114,6 +114,21 @@ class App extends Component {
         snackBarActive: true,
         loading: false
       }))
+  }
+
+  _createPlanning = planning => async () => {
+    await this.setState({ loading: true, plan: '', demand: '', supply: '' })
+    createPlanning(planning)
+      .then(res => {
+        const { status } = res
+        if (status === 201) this._fetchAllPlannings()
+      })
+      .catch(err => this.setState({
+        errorMessage: err.message || 'Error on creating planning',
+        snackBarActive: true,
+        loading: false
+      }))
+    this.handleModalClose()
   }
 
   handleModalClose = () => this.setState({ modalActive: false })
@@ -232,6 +247,7 @@ class App extends Component {
             open={modalActive}
             planningYears={planningYears}
             handleClose={this.handleModalClose}
+            createPlanning={this._createPlanning}
           />
           <SnackBar
             handleClose={this.handleCloseSnackBar}

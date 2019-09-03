@@ -84,7 +84,7 @@ class PlanningBuilder extends Component {
     if (key.match(regex).length === 5) return `FTE${key.substr(key.lastIndexOf('_'))}`
   }
 
-  mapStateToPlanningTable = () => {
+  mapStateToPlanningTable = async () => {
     const { planningYears } = this.state
 
     const newPlanning = {
@@ -124,6 +124,7 @@ class PlanningBuilder extends Component {
       if (dArr[i + 1] && dArr[i + 1].tableName) {
         newPlanning.planningDemand.push(dObj)
         dObj = { tableName: '', planningLevels: [] }
+        continue
       }
 
       if (!dArr[i + 1]) newPlanning.planningDemand.push(dObj)
@@ -145,10 +146,20 @@ class PlanningBuilder extends Component {
       if (sArr[i + 1] && sArr[i + 1].tableName) {
         newPlanning.planningSupply.push(lObj)
         lObj = { tableName: '', planningLevels: [] }
+        continue
       }
 
       if (!sArr[i + 1]) newPlanning.planningSupply.push(lObj)
     }
+
+    return newPlanning
+  }
+
+  _createPlanning = async () => {
+    const { createPlanning } = this.props
+    const newPlanning = await this.mapStateToPlanningTable()
+
+    createPlanning(newPlanning)()
   }
 
   render() {
@@ -286,7 +297,7 @@ class PlanningBuilder extends Component {
         <SimpleButton
           name='Save'
           className={`${classes.button} ${classes.marginTop}`}
-          onClick={() => this.mapStateToPlanningTable()}
+          onClick={() => this._createPlanning()}
           disabled={this.isDisabled()}
         />
       </Grid>
