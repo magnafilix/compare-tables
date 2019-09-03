@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Grid, Modal, Typography, withStyles } from '@material-ui/core'
+import { Grid, Modal, withStyles } from '@material-ui/core'
+import PlanningBuiler from '../PlanningBuilder'
 
 const styles = theme => ({
   modal: {
@@ -10,19 +11,28 @@ const styles = theme => ({
   paper: {
     position: 'absolute',
     width: '80%',
+    height: '80%',
+    overflowY: 'scroll',
     backgroundColor: theme.palette.background.paper,
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    '&:focus': {
+      outline: 0
+    }
   }
 })
 
 class SimpleModal extends Component {
   render() {
-    const { open = false, handleClose, classes } = this.props
+    const {
+      open = false,
+      handleClose,
+      classes,
+      planningYears
+    } = this.props
 
     return (
       <Modal
@@ -33,9 +43,7 @@ class SimpleModal extends Component {
         className={classes.modal}
       >
         <Grid className={classes.paper}>
-          <Typography variant='h4'>
-            Modal
-        </Typography>
+          <PlanningBuiler planningYears={planningYears} />
         </Grid>
       </Modal>
     )

@@ -3,11 +3,12 @@ import { Button } from '@material-ui/core'
 
 class SimpleButton extends Component {
   render() {
-    const { name, onClick } = this.props
+    const { name, onClick, className } = this.props
 
     return (
       <Button
         variant="outlined"
+        className={className}
         onClick={onClick}>
         {name}
       </Button>

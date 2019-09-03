@@ -39,13 +39,12 @@ const styles = theme => ({
   spaceBetween: {
     justifyContent: 'space-between'
   },
-  centrify: {
-    justifyContent: 'center',
-    marginTop: '15%'
-  },
   notifier: {
     textAlign: 'center',
     marginTop: '15%'
+  },
+  button: {
+    marginRight: 10
   }
 })
 
@@ -64,7 +63,8 @@ class App extends Component {
     plannings: [],
     plan: '',
     demand: '',
-    supply: ''
+    supply: '',
+    planningYears: []
   }
 
   componentDidMount = () => this._fetchAllPlannings()
@@ -75,7 +75,11 @@ class App extends Component {
       if (data.length === 0)
         return this.setState({ loading: false })
 
-      this.setState({ plannings: data, loading: false })
+      this.setState({
+        plannings: data,
+        loading: false,
+        planningYears: data.map(({ planningName }) => planningName.match(/\d+/g).map(Number))
+      })
       this.handleChange(selectNames.plan.objName)({ target: { value: data[0]._id } })
     })
     .catch(err => this.setState({
@@ -125,7 +129,8 @@ class App extends Component {
       plannings,
       plan,
       demand,
-      supply
+      supply,
+      planningYears
     } = this.state
     const { classes } = this.props
 
@@ -167,10 +172,10 @@ class App extends Component {
                     {
                       plan
                         ? (
-                          <Fragment>
-                            <SimpleButton name='Create' onClick={() => this.handleModalOpen()} />
-                            <SimpleButton name='Delete' onClick={this._deletePlanning(plan)} />
-                          </Fragment>
+                          <Grid>
+                            <SimpleButton name='Create' className={classes.button} onClick={() => this.handleModalOpen()} />
+                            <SimpleButton name='Delete' className={classes.button} onClick={this._deletePlanning(plan)} />
+                          </Grid>
                         )
                         : <SimpleButton name='Create' onClick={() => this.handleModalOpen()} />
                     }
@@ -225,6 +230,7 @@ class App extends Component {
           }
           <SimpleModal
             open={modalActive}
+            planningYears={planningYears}
             handleClose={this.handleModalClose}
           />
           <SnackBar
